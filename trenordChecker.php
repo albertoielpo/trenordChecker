@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Alberto Ielpo
- * @version 0.2
+ * @version 0.3
  * Check link and send email
  */
 $config = require 'config.php';
@@ -15,8 +15,7 @@ $br="<br/>";
 /**
  * get page from url
  */
-function getPage ($url) {
-    $useragent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36';
+function getPage ($url, $useragent) {    
     $timeout= 120;
     $dir            = dirname(__FILE__);
     $cookie_file    = $dir . '/cookies/' . md5("127.0.0.1") . '.txt';
@@ -48,28 +47,34 @@ function getPage ($url) {
 echo "Trenord checker v." . $config['version'] . $br;
 echo "Start " . date(DATE_RFC2822) . $br;
 $textMail = "";
-$json = getPage($url);
+$json = getPage($url, $config['ua']);
 $parsed = json_decode($json, true);
 foreach ($parsed as $par) {
     if(in_array($par['descrizione'], $dirToCheck)){        
         //var_dump($par);       //debug 
-        $textMail .= $i18n[$par['descrizione']] . "\n";
+        $textMail .= "Direttrice: " . $i18n[$par['descrizione']] . "\n";
         foreach ($par['news'] as $news) {
-            $textMail .= $news['date'] . "\n";
-            $textMail .= $news['severity_description'] . "\n";
-            $textMail .= $news['description'] . "\n";
+            $datetime = $news['date'];
+            $datetime = str_replace("T"," ",$datetime);
+            $datetime = str_replace("Z","",$datetime);
+
+            $textMail .= "Data: " . $datetime . "\n";
+            $textMail .= "Severity: " . $news['severity_description'] . "\n";
+            $textMail .=  $news['description'] . "\n\n";
         }
-        $textMail.="\n";
+        $textMail.="=====================\n";
     }
 }
 
 if($send_mail){
-    $to      = 'alberto.ielpo@gmail.com';
-    $subject = 'Controllo direttrici Trenord';
+    $to      = "alberto@ielpo.net";
+    $subject = "Controllo direttrici Trenord";
     $message = $textMail;
-    $headers = 'From: services@ielpo.net' . "\r\n" .
-        'Reply-To: services@ielpo.net' . "\r\n" .
-        'X-Mailer: PHP/' . phpversion();
+    $headers = 
+        "From: services@ielpo.net" . "\r\n" .
+        "Reply-To: services@ielpo.net" . "\r\n" .
+        "X-Mailer: PHP/" . phpversion() . "\r\n" .
+        "Bcc: alberto.ielpo@gmail.com". "\r\n" ;
     
     mail($to, $subject, $message, $headers);
 }
