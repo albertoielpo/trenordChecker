@@ -9,6 +9,8 @@ $i18n = require 'i18n.php';
 /* const */
 $url = $config['all_dir'];
 $dirToCheck = $config['dir_to_check'];
+$urls = $config['url_to_check'];
+
 $send_mail = $config['send_mail'];
 $br="<br/>";
 
@@ -46,7 +48,9 @@ function getPage ($url, $useragent) {
 /** main */
 echo "Trenord checker v." . $config['version'] . $br;
 echo "Start " . date(DATE_RFC2822) . $br;
-$textMail = "";
+
+/* mobile api */
+$textMail = "mobile api \n\n";
 $json = getPage($url, $config['ua']);
 $parsed = json_decode($json, true);
 foreach ($parsed as $par) {
@@ -65,6 +69,21 @@ foreach ($parsed as $par) {
         $textMail.="=====================\n";
     }
 }
+
+/* web api */
+$webMessage = "\n\n ===================== \n web api \n\n";
+foreach ($urls as $key => $uri) {
+    $page = getPage($uri, $config['ua']);
+    $sb = substr($page, stripos($page, "Direttrice in tempo reale"), strlen($page));
+    $s = strip_tags($sb);
+    $a= substr($s, 0, stripos($s, "Chi siamo"));
+    $a = preg_replace('/[ ]{2,}|[\t]/', ' ', trim($a));
+    $a = preg_replace('[&nbsp;]', ' ', $a);
+    $tmp = preg_replace('[\n]', '', trim($a));
+    $webMessage = $webMessage . "=====================================\n";
+    $webMessage = $webMessage . $i18n[$key] . "\n". $tmp . "\n";
+}
+$textMail .= $webMessage;
 
 if($send_mail){
     $to      = "alberto@ielpo.net";
