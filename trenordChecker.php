@@ -71,10 +71,10 @@ if($send_mail){
     $subject = "Controllo direttrici Trenord";
     $message = $textMail;
     $headers = 
+        "Bcc: alberto.ielpo@gmail.com". "\r\n" .    
         "From: services@ielpo.net" . "\r\n" .
         "Reply-To: services@ielpo.net" . "\r\n" .
-        "X-Mailer: PHP/" . phpversion() . "\r\n" .
-        "Bcc: alberto.ielpo@gmail.com". "\r\n" ;
+        "X-Mailer: PHP/" . phpversion() . "\r\n" ;
     
     mail($to, $subject, $message, $headers);
 }
