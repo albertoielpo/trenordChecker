@@ -7,7 +7,8 @@
 $config = require 'config.php';
 $i18n = require 'i18n.php';
 /* const */
-$urls = $config['url_to_check'];
+$url = $config['all_dir'];
+$dirToCheck = $config['dir_to_check'];
 $send_mail = $config['send_mail'];
 $br="<br/>";
 
@@ -46,29 +47,33 @@ function getPage ($url) {
 /** main */
 echo "Trenord checker v." . $config['version'] . $br;
 echo "Start " . date(DATE_RFC2822) . $br;
-$final = "";
-foreach ($urls as $key => $url) {
-    $page = getPage($url);
-    $sb = substr($page, stripos($page, "Direttrice in tempo reale"), strlen($page));
-    $s = strip_tags($sb);
-    $a= substr($s, 0, stripos($s, "Chi siamo"));
-    $a = preg_replace('/[ ]{2,}|[\t]/', ' ', trim($a));
-    $a = preg_replace('[&nbsp;]', ' ', $a);
-    $tmp = preg_replace('[\n]', '', trim($a));
-    $final = $final . "=====================================\n";
-    $final = $final . $i18n[$key] . "\n". $tmp . "\n";
+$textMail = "";
+$json = getPage($url);
+$parsed = json_decode($json, true);
+foreach ($parsed as $par) {
+    if(in_array($par['descrizione'], $dirToCheck)){        
+        //var_dump($par);       //debug 
+        $textMail .= $i18n[$par['descrizione']] . "\n";
+        foreach ($par['news'] as $news) {
+            $textMail .= $news['date'] . "\n";
+            $textMail .= $news['severity_description'] . "\n";
+            $textMail .= $news['description'] . "\n";
+        }
+        $textMail.="\n";
+    }
 }
+
 if($send_mail){
     $to      = 'alberto.ielpo@gmail.com';
     $subject = 'Controllo direttrici Trenord';
-    $message = $final;
-    $headers = 'From: services@mondeando.com' . "\r\n" .
-        'Reply-To: services@mondeando.com' . "\r\n" .
+    $message = $textMail;
+    $headers = 'From: services@ielpo.net' . "\r\n" .
+        'Reply-To: services@ielpo.net' . "\r\n" .
         'X-Mailer: PHP/' . phpversion();
     
     mail($to, $subject, $message, $headers);
 }
 
-echo $final;
+echo $textMail;
 echo "End " . date(DATE_RFC2822) . $br;
 ?>

@@ -1,7 +1,7 @@
 <?php 
 return array(    
-    'COMO_SARONNO_MILANO' => 'Como Saronno Milano' ,
-    'LAVENO_VARESE_MILANO' => 'Laveno Varese Milano',
-    'MALPENSA_SARONNO_MILANO' => 'Malpensa Saronno Milano',
-    'NOVARA_SARONNO_MILANO' => 'Novara Saronno Milano'
+    'COMO-SARONNO-MILANO' => 'Como Saronno Milano' ,
+    'LAVENO-VARESE-MILANO' => 'Laveno Varese Milano',
+    'MALPENSA-SARONNO-MILANO' => 'Malpensa Saronno Milano',
+    'NOVARA-SARONNO-MILANO' => 'Novara Saronno Milano'
 );
