@@ -53,7 +53,7 @@ if($api_mobile_enabled){
 
 if($api_web_enabled){
     /* web api */
-    $webMessage = "\n\n ===================== \n web api \n\n";
+    $webMessage = "\n\n=====================\nweb api \n\n";
     foreach ($urls as $key => $uri) {
         $page = $wget->download($uri);
         $sb = substr($page, stripos($page, "Direttrice in tempo reale"), strlen($page));
